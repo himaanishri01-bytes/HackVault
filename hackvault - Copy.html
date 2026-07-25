@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackVault | Competition Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 500: '#a855f7', 600: '#9333ea', 700: '#7e22ce' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style id="appDynamicStyles">
+        :root {
+            --accent-grad: linear-gradient(135deg, #c084fc, #f472b6, #fb923c);
+            --btn-grad: linear-gradient(135deg, #8b5cf6, #ec4899);
+            --accent-color: #c084fc;
+        }
+
+        body { 
+            transition: background-color 0.3s ease, color 0.3s ease; 
+            background-color: #090514;
+        }
+
+        .app-card {
+            background: linear-gradient(145deg, rgba(23, 15, 38, 0.85), rgba(15, 10, 26, 0.85));
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .gradient-text {
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-gradient {
+            background: var(--btn-grad);
+            color: #ffffff;
+            transition: opacity 0.2s ease;
+        }
+        .btn-gradient:hover {
+            opacity: 0.9;
+        }
+
+        /* Card Design Styles */
+        body.card-solid .app-card {
+            background: #130f26 !important;
+            border: 1px solid #312356 !important;
+            backdrop-filter: none !important;
+        }
+        body.card-solid .gradient-text {
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+            color: var(--accent-color) !important;
+        }
+        body.card-solid .btn-gradient {
+            background: #9333ea !important;
+            color: #ffffff !important;
+        }
+
+        body.card-glass .app-card {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(16px) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Light Theme Overrides */
+        body.theme-light {
+            color: #0f172a !important;
+        }
+        body.theme-light .app-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        body.theme-light h1, body.theme-light h2, body.theme-light h3, body.theme-light .text-white {
+            color: #0f172a !important;
+        }
+        body.theme-light .text-slate-300, body.theme-light .text-slate-400, body.theme-light .text-purple-200\/60 {
+            color: #475569 !important;
+        }
+        body.theme-light .bg-slate-950\/80, body.theme-light .bg-slate-950\/60, body.theme-light .bg-slate-950\/70 {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+    </style>
+</head>
+<body id="appBody" class="text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <header id="topNavbar" class="hidden border-b border-purple-900/40 bg-slate-950/80 backdrop-blur-md px-6 py-3 sticky top-0 z-40 justify-between items-center">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('homeView')">
+            <div class="btn-gradient p-2 rounded-xl font-bold shadow-md">
+                <i class="fa-solid fa-vault"></i>
+            </div>
+            <span class="text-xl font-extrabold text-white">Hack<span class="gradient-text">Vault</span></span>
+        </div>
+
+        <nav class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium">
+            <button type="button" onclick="navigateTo('homeView')" id="nav-homeView" class="nav-btn px-3.5 py-2 rounded-xl text-purple-300 bg-purple-500/15 border border-purple-500/30 font-bold">
+                <i class="fa-solid fa-house mr-1.5"></i>Home
+            </button>
+            <button type="button" onclick="navigateTo('hackathonsView')" id="nav-hackathonsView" class="nav-btn px-3.5 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-purple-900/20 transition">
+                <i class="fa-solid fa-trophy mr-1.5"></i>Hackathons
+            </button>
+            <button type="button" onclick="navigateTo('vaultView')" id="nav-vaultView" class="nav-btn px-3.5 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-purple-900/20 transition">
+                <i class="fa-solid fa-folder-closed mr-1.5"></i>Vault
+            </button>
+            <button type="button" onclick="navigateTo('profileView')" id="nav-profileView" class="nav-btn px-3.5 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-purple-900/20 transition">
+                <i class="fa-solid fa-user mr-1.5"></i>Profile
+            </button>
+            <button type="button" onclick="navigateTo('settingsView')" id="nav-settingsView" class="nav-btn px-3.5 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-purple-900/20 transition">
+                <i class="fa-solid fa-gear mr-1.5"></i>Settings
+            </button>
+        </nav>
+
+        <div class="flex items-center gap-3 text-xs">
+            <span class="hidden md:inline-block font-semibold text-purple-200/80" id="navEmailDisplay">user@hackathon.io</span>
+            <button type="button" onclick="logout()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-purple-900/40 transition">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </header>
+
+
+    <section id="landingView" class="flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md app-card rounded-3xl p-8 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="inline-block btn-gradient p-3.5 rounded-2xl mb-3 shadow-lg">
+                    <i class="fa-solid fa-vault text-2xl"></i>
+                </div>
+                <h1 id="authTitle" class="text-2xl font-black text-white">Welcome to Hack<span class="gradient-text">Vault</span></h1>
+                <p id="authSubtitle" class="text-xs text-purple-200/60 mt-1">Sign in to access your hackathon command center</p>
+            </div>
+
+            <form onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="nameField" class="hidden">
+                    <label class="block text-xs font-semibold text-purple-200/70 mb-1">Full Name</label>
+                    <input type="text" id="authName" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-pink-500" placeholder="Alex Dev">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-purple-200/70 mb-1">Email Address</label>
+                    <input type="email" id="authEmail" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-pink-500" placeholder="hacker@hackathon.io">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-purple-200/70 mb-1">Password</label>
+                    <input type="password" id="authPassword" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-pink-500" placeholder="••••••••">
+                </div>
+
+                <button type="submit" id="authBtn" class="w-full btn-gradient font-bold p-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-lg">
+                    <span>Sign In</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-6 pt-4 border-t border-purple-900/30 text-xs text-slate-400">
+                <span id="authToggleText">Don't have an account?</span>
+                <button type="button" onclick="toggleAuthMode()" id="authToggleBtn" class="gradient-text font-bold hover:underline ml-1">Register Option</button>
+            </div>
+        </div>
+    </section>
+
+
+    <main id="homeView" class="hidden flex-1 max-w-7xl w-full mx-auto p-6 space-y-8">
+        <div class="app-card rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white">Dashboard <span class="gradient-text">Overview</span></h1>
+                <p class="text-xs text-purple-200/60 mt-1">Track active events, multi-tool AI integrations, and execution momentum.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-4 py-2 rounded-full font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Streak Active: 12 Days
+                </span>
+            </div>
+        </div>
+
+        <section class="space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-tower-broadcast text-pink-400"></i> Live & Ongoing Hackathons
+                </h2>
+                <button type="button" onclick="navigateTo('hackathonsView')" class="text-xs gradient-text font-bold hover:underline">View All →</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="homeLiveCards"></div>
+        </section>
+
+        <div class="app-card rounded-2xl p-6 space-y-4 shadow-xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i> July 2026 Activity Heatmap
+                </h3>
+                <span class="text-xs text-purple-200/60">Daily Coding & Building Streak</span>
+            </div>
+            <div id="homeHeatmapContainer" class="grid grid-cols-7 gap-2 max-w-xl"></div>
+        </div>
+    </main>
+
+
+    <main id="hackathonsView" class="hidden flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Hackathons & Projects</h1>
+                <p class="text-xs text-purple-200/60 mt-1">Manage ongoing and past competitions with mandatory tool stacks and team details.</p>
+            </div>
+            <button type="button" onclick="openAddHackathonModal()" class="btn-gradient text-xs px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-plus"></i> Add Hackathon
+            </button>
+        </div>
+
+        <section class="space-y-3">
+            <h2 class="text-sm font-bold gradient-text uppercase tracking-wider">Present / Live / Ongoing Competitions</h2>
+            <div class="space-y-4" id="ongoingList"></div>
+        </section>
+
+        <section class="space-y-3 pt-6 border-t border-purple-900/30">
+            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Past & Archive Competitions</h2>
+            <div class="space-y-4" id="pastList"></div>
+        </section>
+    </main>
+
+
+    <main id="vaultView" class="hidden flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Vault & Submissions Archive</h1>
+                <p class="text-xs text-purple-200/60 mt-1">Central repository for all project outputs, decks, and tool logs.</p>
+            </div>
+        </div>
+
+        <div class="app-card rounded-2xl p-6 space-y-4 shadow-xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i> Monthly Contribution & Builder Heatmap (July 2026)
+                </h3>
+                <span class="text-xs text-purple-200/60">Streak Tracking</span>
+            </div>
+            <div id="vaultHeatmapContainer" class="grid grid-cols-7 gap-2 max-w-xl"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="vaultCardsList"></div>
+    </main>
+
+
+    <main id="profileView" class="hidden flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+        <div class="app-card rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div class="btn-gradient p-6 rounded-2xl text-4xl shadow-xl flex-shrink-0">
+                <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            
+            <div class="flex-1 text-center md:text-left space-y-3">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-white" id="profileName">Alex Developer</h1>
+                        <p class="text-xs text-purple-300/80 font-medium mt-0.5" id="profileEmail">hacker@hackathon.io</p>
+                    </div>
+                    <span class="bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs px-3.5 py-1.5 rounded-full font-semibold self-center md:self-start">
+                        <i class="fa-solid fa-code-commit text-pink-400 mr-1.5"></i> Senior Builder
+                    </span>
+                </div>
+
+                <div class="bg-slate-950/60 border border-purple-900/30 rounded-xl p-3.5 text-xs text-slate-300 leading-relaxed">
+                    <p id="profileBioText"><i class="fa-solid fa-quote-left text-pink-400/50 mr-2"></i>Full-Stack Developer & AI builder orchestrating Claude, ChatGPT, Gemini, Grok, Manus, Lovable, Figma, and Replit for rapid prototyping.</p>
+                </div>
+
+                <div class="pt-1 flex flex-wrap justify-center md:justify-start gap-2.5 text-xs">
+                    <span class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3.5 py-1.5 rounded-xl font-bold" id="profileCountDisplay">
+                        <i class="fa-solid fa-trophy text-amber-400 mr-1.5"></i> Participations: 7
+                    </span>
+                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3.5 py-1.5 rounded-xl font-bold" id="profileWinnersDisplay">
+                        <i class="fa-solid fa-medal text-emerald-400 mr-1.5"></i> Winner Badges: 4
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-card rounded-2xl p-6 space-y-4 shadow-xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-amber-400"></i> Annual Contribution Heatmap — July 2026
+                </h3>
+                <span class="text-xs text-purple-200/60">12 Days Streak Active</span>
+            </div>
+            <div id="profileHeatmapContainer" class="grid grid-cols-7 gap-2 max-w-xl"></div>
+        </div>
+    </main>
+
+
+    <main id="settingsView" class="hidden flex-1 max-w-4xl w-full mx-auto p-6 space-y-6">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Application Control & Customization</h1>
+            <p class="text-xs text-purple-200/60 mt-1">Select from 10 distinct themes, card appearance styles, accent color gradients, and configure notification specifications.</p>
+        </div>
+
+        <div class="space-y-6 text-xs">
+            <div class="app-card rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white flex items-center justify-between border-b border-purple-900/30 pb-3">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-desktop text-indigo-400"></i> Background Themes (10 Options)</span>
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    <button type="button" onclick="setBgTheme('violet')" id="bg-violet" class="theme-btn p-3 rounded-xl border-2 border-pink-500 bg-[#090514] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#090514] border border-purple-500"></span> Deep Violet
+                    </button>
+                    <button type="button" onclick="setBgTheme('midnight')" id="bg-midnight" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#020204] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#020204] border border-slate-700"></span> Pitch Black
+                    </button>
+                    <button type="button" onclick="setBgTheme('cyberpunk')" id="bg-cyberpunk" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#04120e] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#04120e] border border-emerald-500"></span> Cyber Emerald
+                    </button>
+                    <button type="button" onclick="setBgTheme('abyss')" id="bg-abyss" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#030d1a] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#030d1a] border border-cyan-500"></span> Ocean Abyss
+                    </button>
+                    <button type="button" onclick="setBgTheme('sunset')" id="bg-sunset" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#170803] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#170803] border border-amber-500"></span> Sunset Amber
+                    </button>
+                    <button type="button" onclick="setBgTheme('dracula')" id="bg-dracula" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#12001c] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#12001c] border border-fuchsia-500"></span> Dracula Glow
+                    </button>
+                    <button type="button" onclick="setBgTheme('nord')" id="bg-nord" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#0f172a] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#0f172a] border border-sky-400"></span> Nord Frost
+                    </button>
+                    <button type="button" onclick="setBgTheme('solarized')" id="bg-solarized" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#002b36] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#002b36] border border-teal-400"></span> Solarized Dark
+                    </button>
+                    <button type="button" onclick="setBgTheme('rosequartz')" id="bg-rosequartz" class="theme-btn p-3 rounded-xl border border-slate-800 bg-[#1f0b16] text-white font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-[#1f0b16] border border-rose-400"></span> Rose Quartz
+                    </button>
+                    <button type="button" onclick="setBgTheme('light')" id="bg-light" class="theme-btn p-3 rounded-xl border border-slate-300 bg-slate-100 text-slate-900 font-bold flex flex-col items-center gap-1.5 transition">
+                        <span class="w-5 h-5 rounded-full bg-white border border-slate-400"></span> Soft Light
+                    </button>
+                </div>
+            </div>
+
+            <div class="app-card rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white flex items-center justify-between border-b border-purple-900/30 pb-3">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-square text-pink-400"></i> Card Style Options</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button type="button" onclick="setCardStyle('glass')" id="cardStyle-glass" class="p-3 rounded-xl border-2 border-pink-500 bg-purple-900/20 text-white font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Glassmorphism Blur
+                    </button>
+                    <button type="button" onclick="setCardStyle('solid')" id="cardStyle-solid" class="p-3 rounded-xl border border-purple-900/40 bg-slate-900 text-slate-300 font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-cube"></i> Solid Dark Mode
+                    </button>
+                    <button type="button" onclick="setCardStyle('neon')" id="cardStyle-neon" class="p-3 rounded-xl border border-purple-900/40 bg-slate-900 text-slate-300 font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-bolt"></i> Neon Border Glow
+                    </button>
+                </div>
+            </div>
+
+            <div class="app-card rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white flex items-center justify-between border-b border-purple-900/30 pb-3">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-palette text-amber-400"></i> Accent Color Palette</span>
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button type="button" onclick="setAccent('purple')" class="p-3 rounded-xl border border-purple-500/40 bg-purple-950/40 text-purple-300 font-bold flex items-center gap-2">
+                        <span class="w-4 h-4 rounded-full bg-purple-500"></span> Purple Neon
+                    </button>
+                    <button type="button" onclick="setAccent('emerald')" class="p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/40 text-emerald-300 font-bold flex items-center gap-2">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500"></span> Cyber Emerald
+                    </button>
+                    <button type="button" onclick="setAccent('sunset')" class="p-3 rounded-xl border border-amber-500/40 bg-amber-950/40 text-amber-300 font-bold flex items-center gap-2">
+                        <span class="w-4 h-4 rounded-full bg-amber-500"></span> Sunset Gold
+                    </button>
+                    <button type="button" onclick="setAccent('cyan')" class="p-3 rounded-xl border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 font-bold flex items-center gap-2">
+                        <span class="w-4 h-4 rounded-full bg-cyan-500"></span> Electric Cyan
+                    </button>
+                </div>
+            </div>
+
+            <div class="app-card rounded-2xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white flex items-center justify-between border-b border-purple-900/30 pb-3">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-bell text-pink-400"></i> Notification Specifications & Alerts</span>
+                </h3>
+                <div class="space-y-3">
+                    <label class="flex items-center justify-between p-3 bg-slate-950/60 border border-purple-900/30 rounded-xl cursor-pointer">
+                        <div>
+                            <span class="font-bold text-white block">Enable Push & Browser Notifications</span>
+                            <span class="text-[11px] text-purple-200/60">Receive real-time alerts for active hackathon milestones and deadlines.</span>
+                        </div>
+                        <input type="checkbox" id="notifGlobal" checked class="w-4 h-4 accent-purple-500" onchange="triggerNotificationAlert()">
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 bg-slate-950/60 border border-purple-900/30 rounded-xl cursor-pointer">
+                        <div>
+                            <span class="font-bold text-white block">Submission Deadline Reminders (24h & 2h left)</span>
+                            <span class="text-[11px] text-purple-200/60">Alerts when ongoing hackathons are about to close.</span>
+                        </div>
+                        <input type="checkbox" checked class="w-4 h-4 accent-purple-500">
+                    </label>
+
+                    <div class="pt-2 flex justify-end">
+                        <button type="button" onclick="alert('Notification preferences saved successfully!')" class="btn-gradient font-bold px-5 py-2.5 rounded-xl shadow-lg">Save Notification Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <div id="addHackathonModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="app-card w-full max-w-2xl rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-purple-900/30 pb-3">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-pink-400"></i> Add New Hackathon Project
+                </h2>
+                <button type="button" onclick="closeAddHackathonModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleNewHackathonSubmit(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Hackathon Name *</label>
+                        <input type="text" id="newTitle" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500" placeholder="e.g. AI World Summit 2026">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Track / Category *</label>
+                        <input type="text" id="newTrack" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500" placeholder="e.g. Generative AI, Web3, FinTech">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Timeline & Dates *</label>
+                        <input type="text" id="newTimeline" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500" placeholder="e.g. Oct 12 - Oct 14, 2026">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Status / Phase *</label>
+                        <select id="newStatus" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                            <option value="ongoing">Present / Live / Ongoing Event</option>
+                            <option value="evaluation">Under Evaluation</option>
+                            <option value="completed">Completed (Past)</option>
+                            <option value="won">Won (1st Place / Top Rank)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-purple-200/70 mb-1">Brief Project Summary (4-5 Lines Recommended) *</label>
+                    <textarea id="newDesc" required rows="4" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500" placeholder="Provide a concise 4-5 line summary detailing the problem statement, core technological innovation, target users, and key architectural outcomes..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Team Size</label>
+                        <input type="number" id="newTeamSize" value="4" min="1" max="10" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Team Members & Roles *</label>
+                        <input type="text" id="newTeamMembers" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500" placeholder="e.g. Alex (Frontend Lead), Sarah (AI Engineer), Dave (Backend)">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">PPT / Deck URL</label>
+                        <input type="url" id="newPpt" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs" placeholder="https://slides.com/...">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">PDF / Doc URL</label>
+                        <input type="url" id="newPdf" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs" placeholder="https://doc.com/...">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Prototype URL</label>
+                        <input type="url" id="newPrototype" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs" placeholder="https://demo.app/...">
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3">
+                    <button type="button" onclick="closeAddHackathonModal()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-purple-900/40">Cancel</button>
+                    <button type="submit" class="btn-gradient font-bold px-6 py-2.5 rounded-xl shadow-lg">Create Workspace</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="editHackathonModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="app-card w-full max-w-2xl rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-purple-900/30 pb-3">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-pink-400"></i> Edit / Manage Workspace
+                </h2>
+                <button type="button" onclick="closeEditHackathonModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleEditHackathonSubmit(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="editHackathonId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Hackathon Title</label>
+                        <input type="text" id="editTitle" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Track / Category</label>
+                        <input type="text" id="editTrack" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Timeline & Schedule</label>
+                        <input type="text" id="editTimeline" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Status / Phase Result</label>
+                        <select id="editStatus" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                            <option value="ongoing">Present / Live / Ongoing Event ⚡</option>
+                            <option value="evaluation">Under Evaluation ⏳</option>
+                            <option value="completed">Completed / Archive (Past) 🏅</option>
+                            <option value="won">Won 1st Place / Top Rank 🏆</option>
+                            <option value="finalist">Finalist Badge 🎖️</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-purple-200/70 mb-1">Brief Project Summary (4-5 Lines)</label>
+                    <textarea id="editDesc" rows="4" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Team Size</label>
+                        <input type="number" id="editTeamSize" min="1" max="10" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Team Members & Roles</label>
+                        <input type="text" id="editTeamMembers" required class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-pink-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">PPT / Deck URL</label>
+                        <input type="url" id="editPpt" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">PDF / Doc URL</label>
+                        <input type="url" id="editPdf" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-purple-200/70 mb-1">Prototype URL</label>
+                        <input type="url" id="editPrototype" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-pink-500 text-xs">
+                    </div>
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditHackathonModal()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-purple-900/40">Cancel</button>
+                    <button type="submit" class="btn-gradient font-bold px-6 py-2.5 rounded-xl shadow-lg">Save All Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="app-card w-full max-w-md rounded-2xl p-6 space-y-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Delete Hackathon
+            </h2>
+            <p class="text-xs text-purple-200/70">Are you sure you want to remove this hackathon workspace? Please state your reason for record keeping.</p>
+            
+            <input type="hidden" id="deleteTargetId">
+            <div>
+                <label class="block font-semibold text-purple-200/70 text-xs mb-1">Reason for Deletion</label>
+                <textarea id="deleteReason" rows="2" class="w-full bg-slate-950/80 border border-purple-900/40 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-500" placeholder="e.g. Disqualified, event canceled, duplicate entry..."></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3 text-xs">
+                <button type="button" onclick="closeDeleteModal()" class="bg-slate-900 text-slate-300 font-bold px-4 py-2 rounded-xl border border-purple-900/40">Cancel</button>
+                <button type="button" onclick="confirmDeleteHackathon()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl shadow-lg transition">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="projectModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="app-card w-full max-w-2xl rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto relative shadow-2xl border border-pink-500/40">
+            <div class="flex justify-between items-start border-b border-purple-900/30 pb-3">
+                <div>
+                    <span class="text-xs text-pink-400 font-bold" id="modalStage">Live Ongoing Event</span>
+                    <h2 class="text-xl font-bold text-white mt-0.5" id="modalTitle">InnovaHack 2026</h2>
+                </div>
+                <button type="button" onclick="closeProjectModal()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Project Brief Summary (4-5 Lines)</h4>
+                <p class="text-xs text-slate-300 bg-slate-950/80 p-3.5 rounded-xl border border-purple-900/30 leading-relaxed" id="modalDesc"></p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3 bg-slate-950/80 border border-purple-900/30 rounded-xl">
+                    <span class="text-slate-400 block mb-1 font-bold"><i class="fa-solid fa-calendar-days text-indigo-400 mr-1.5"></i> Timeline / Schedule</span>
+                    <span class="text-white font-semibold" id="modalTimeline">N/A</span>
+                </div>
+                <div class="p-3 bg-slate-950/80 border border-purple-900/30 rounded-xl">
+                    <span class="text-slate-400 block mb-1 font-bold"><i class="fa-solid fa-users text-emerald-400 mr-1.5"></i> Team Roster & Roles</span>
+                    <span class="text-white font-semibold" id="modalTeam">N/A</span>
+                </div>
+            </div>
+
+            <div id="modalOngoingAiSection" class="space-y-2 pt-1 hidden">
+                <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-bolt mr-1"></i> Quick AI Platform Launch (8x2 Navigation Grid)</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs" id="modalAiButtonsContainer"></div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+                <h4 class="text-xs font-bold gradient-text uppercase tracking-wider mb-2">Project Artifacts & Submissions</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="modalArtifactsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="border-t border-purple-900/30 py-4 text-center text-xs text-purple-200/40">
+        HackVault &copy; 2026 — Dynamic Multi-Theme Workspace Engine
+    </footer>
+
+
+    <script>
+        let hackathonsData = [
+            {
+                id: '1',
+                title: 'Omni-Model Agentic Hackathon 2026',
+                status: 'ongoing',
+                stage: 'Present / Live / Ongoing Event ⚡',
+                desc: 'An intensive real-time challenge focused on building cross-platform agentic code assistants. We utilize Claude for deep code auditing, ChatGPT for creative UI copy generation, and Gemini for handling large context token analysis. The underlying microservices are fully bootstrapped and deployed live directly inside Replit.',
+                timeline: 'July 24 - July 26, 2026',
+                teamSize: 4,
+                teamMembers: 'Alex (Lead Architect - Claude/Replit), Sarah (UI/UX - Figma/Lovable), Mark (Prompt Engineer - ChatGPT/Gemini), Dave (Autonomous Agents - Grok/Manus)',
+                track: 'Multi-LLM Workflows',
+                resultBadge: 'Live ⚡',
+                ppt: 'https://slides.com/omni-agent-deck',
+                pdf: 'https://doc.com/omni-agent-whitepaper.pdf',
+                prototype: 'https://demo.omniagent.app'
+            },
+            {
+                id: '2',
+                title: 'AI Full-Stack Sprint 2026',
+                status: 'ongoing',
+                stage: 'Present / Live / Ongoing Event ⚡',
+                desc: 'A high-speed hackathon testing rapid interface generation and automated backend execution loops. Wireframes are designed meticulously in Figma and instantly transformed into production components via Lovable. Autonomous task management is executed through Manus, while complex backend edge queries are benchmarked across Grok, ChatGPT, and Claude.',
+                timeline: 'July 25 - July 28, 2026',
+                teamSize: 3,
+                teamMembers: 'Elena (Design Lead - Figma/Lovable), Jordan (Fullstack - Replit/Claude), Chloe (AI Orchestrator - Manus/Grok/ChatGPT/Gemini)',
+                track: 'Rapid Prototyping',
+                resultBadge: 'Live ⚡',
+                ppt: 'https://slides.com/fullstack-sprint-deck',
+                pdf: 'https://doc.com/fullstack-sprint-report.pdf',
+                prototype: 'https://demo.aifullstack.dev'
+            },
+            {
+                id: '3',
+                title: 'Campus AI Challenge 2025',
+                status: 'won',
+                stage: '1st Place Winner 🏆',
+                desc: 'An automated EdTech platform that ingests unstructured university syllabi and generates personalized interactive study roadmaps instantly. Features built-in spaced repetition flashcard generation, automated quiz creation, and real-time collaborative student study rooms. Secured 1st place among 120 competing university teams globally.',
+                timeline: 'Nov 14 - Nov 16, 2025',
+                teamSize: 4,
+                teamMembers: 'Alex (Project Lead), Sam (NLP Specialist), Taylor (Full-stack Developer), Jordan (UI Designer)',
+                track: 'EdTech Automations',
+                resultBadge: '1st Place Winner 🏆',
+                ppt: 'https://slides.com/campus-ai-winner-deck',
+                pdf: 'https://doc.com/campus-ai-final-submission.pdf',
+                prototype: 'https://demo.campusai.edu'
+            }
+        ];
+
+        let isRegister = false;
+
+        // AI App URLs mapping for navigation buttons
+        const aiPlatformUrls = {
+            'Claude': 'https://claude.ai',
+            'ChatGPT': 'https://chatgpt.com',
+            'Gemini': 'https://gemini.google.com',
+            'Grok': 'https://grok.com',
+            'Manus': 'https://manus.im',
+            'Lovable': 'https://lovable.dev',
+            'Figma': 'https://figma.com',
+            'Replit': 'https://replit.com'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllViews();
+            renderHeatmaps();
+        });
+
+        function renderAllViews() {
+            renderHomeView();
+            renderHackathonsView();
+            renderVaultView();
+            renderProfileStats();
+            renderHeatmaps();
+        }
+
+        function renderHeatmaps() {
+            const containers = ['homeHeatmapContainer', 'vaultHeatmapContainer', 'profileHeatmapContainer'];
+            
+            containers.forEach(containerId => {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                el.innerHTML = '';
+                
+                const activeDays = [2, 3, 5, 6, 7, 10, 11, 12, 14, 15, 18, 19, 20, 21, 22, 23, 24, 25];
+                
+                for (let day = 1; day <= 31; day++) {
+                    const cell = document.createElement('div');
+                    const isActive = activeDays.includes(day);
+                    cell.className = `h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition ${
+                        isActive 
+                            ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/50 border border-pink-500/40' 
+                            : 'bg-slate-950/60 text-slate-500 border border-purple-900/20'
+                    }`;
+                    cell.title = `July ${day}, 2026: ${isActive ? 'Active building & commits' : 'No activity'}`;
+                    cell.innerText = day;
+                    el.appendChild(cell);
+                }
+            });
+        }
+
+        function copyPromptAndNavigate(toolName, projectTitle, projectDesc, timeline, teamMembers) {
+            const promptText = `Project: ${projectTitle}\nHackathon Details: ${timeline}\nTeam Details: ${teamMembers}\nWorking State & Description: ${projectDesc}\nPlease assist in executing this hackathon module using ${toolName}.`;
+            
+            navigator.clipboard.writeText(promptText).then(() => {
+                const targetUrl = aiPlatformUrls[toolName] || 'https://google.com';
+                alert(`Comprehensive prompt copied for ${toolName}!\n\nRedirecting to ${toolName}...`);
+                window.open(targetUrl, '_blank');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                const targetUrl = aiPlatformUrls[toolName] || 'https://google.com';
+                window.open(targetUrl, '_blank');
+            });
+        }
+
+        function renderHomeView() {
+            const homeCardsContainer = document.getElementById('homeLiveCards');
+            const liveHackathons = hackathonsData.filter(h => h.status === 'ongoing');
+            
+            homeCardsContainer.innerHTML = '';
+            liveHackathons.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "app-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between";
+                card.onclick = () => openHackathonDetails(item.id);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-bold">Live ⚡</span>
+                            <span class="text-amber-400 text-xs font-bold"><i class="fa-solid fa-fire"></i> ${item.track}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">${item.title}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-3">${item.desc}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-purple-900/30 flex justify-between items-center text-xs text-purple-200/60">
+                        <span><i class="fa-solid fa-users text-indigo-400 mr-1"></i> Team Size: ${item.teamSize}</span>
+                        <span class="text-pink-400 font-bold">Open Workspace →</span>
+                    </div>
+                `;
+                homeCardsContainer.appendChild(card);
+            });
+        }
+
+        function renderHackathonsView() {
+            const ongoingList = document.getElementById('ongoingList');
+            const pastList = document.getElementById('pastList');
+
+            ongoingList.innerHTML = '';
+            pastList.innerHTML = '';
+
+            hackathonsData.forEach(item => {
+                const isOngoing = item.status === 'ongoing';
+                
+                const card = document.createElement('div');
+                card.className = "app-card rounded-2xl p-5 space-y-3";
+
+                let artifactsHtml = '';
+                if (item.ppt || item.pdf || item.prototype) {
+                    artifactsHtml = `<div class="flex flex-wrap gap-2 pt-2 border-t border-purple-900/20 text-xs">`;
+                    if (item.ppt) {
+                        artifactsHtml += `<a href="${item.ppt}" target="_blank" onclick="event.stopPropagation()" class="bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 border border-pink-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition"><i class="fa-solid fa-file-powerpoint"></i> View PPT Deck</a>`;
+                    }
+                    if (item.pdf) {
+                        artifactsHtml += `<a href="${item.pdf}" target="_blank" onclick="event.stopPropagation()" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition"><i class="fa-solid fa-file-pdf"></i> View PDF Doc</a>`;
+                    }
+                    if (item.prototype) {
+                        artifactsHtml += `<a href="${item.prototype}" target="_blank" onclick="event.stopPropagation()" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition"><i class="fa-solid fa-laptop-code"></i> Live Prototype</a>`;
+                    }
+                    artifactsHtml += `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${isOngoing ? '<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] px-3 py-1 rounded-full font-bold">Present / Live ⚡</span>' : ''}
+                                <h3 class="text-base font-bold text-white cursor-pointer hover:text-pink-400" onclick="openHackathonDetails('${item.id}')">${item.title}</h3>
+                                <span class="text-[10px] bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md font-semibold">${item.track}</span>
+                                <span class="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md font-semibold">${item.resultBadge}</span>
+                            </div>
+                            <p class="text-xs text-purple-200/60 mt-0.5"><i class="fa-regular fa-calendar text-pink-400 mr-1"></i> ${item.timeline}</p>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-center">
+                            <button type="button" onclick="openHackathonDetails('${item.id}')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs px-3 py-1.5 rounded-xl border border-purple-900/40 transition"><i class="fa-solid fa-eye mr-1"></i> Details</button>
+                            <button type="button" onclick="openEditHackathonModal('${item.id}')" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs px-3 py-1.5 rounded-xl border border-purple-500/30 transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                            <button type="button" onclick="openDeleteModal('${item.id}')" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs px-3 py-1.5 rounded-xl border border-rose-500/20 transition"><i class="fa-solid fa-trash mr-1"></i> Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-slate-300 bg-slate-950/70 p-3.5 rounded-xl border border-purple-900/30 leading-relaxed">
+                        <span class="text-pink-400 font-bold block mb-1"><i class="fa-solid fa-align-left mr-1"></i> Project Brief (4-5 Lines Summary):</span>
+                        <p>${item.desc}</p>
+                    </div>
+
+                    <div class="text-xs text-purple-200/80 bg-slate-950/40 p-3 rounded-xl border border-purple-900/20 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-indigo-400 text-sm"></i>
+                        <div>
+                            <span class="font-bold text-white">Team Roster (${item.teamSize} Members):</span> 
+                            <span>${item.teamMembers}</span>
+                        </div>
+                    </div>
+
+                    ${artifactsHtml}
+                `;
+
+                if (isOngoing) {
+                    ongoingList.appendChild(card);
+                } else {
+                    pastList.appendChild(card);
+                }
+            });
+        }
+
+        function renderVaultView() {
+            const vaultList = document.getElementById('vaultCardsList');
+            vaultList.innerHTML = '';
+
+            hackathonsData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "app-card p-6 rounded-2xl space-y-3";
+                
+                let artifactsHtml = '';
+                if (item.ppt || item.pdf || item.prototype) {
+                    artifactsHtml = `<div class="flex flex-wrap gap-2 pt-2 border-t border-purple-900/20 text-xs">`;
+                    if (item.ppt) artifactsHtml += `<a href="${item.ppt}" target="_blank" class="bg-pink-500/10 text-pink-300 border border-pink-500/30 px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-file-powerpoint"></i> PPT</a>`;
+                    if (item.pdf) artifactsHtml += `<a href="${item.pdf}" target="_blank" class="bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-file-pdf"></i> PDF</a>`;
+                    if (item.prototype) artifactsHtml += `<a href="${item.prototype}" target="_blank" class="bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold"><i class="fa-solid fa-laptop-code"></i> Prototype</a>`;
+                    artifactsHtml += `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs text-pink-400 font-bold">${item.title}</span>
+                            <h3 class="text-base font-bold text-white mt-0.5">${item.track} Workspace</h3>
+                        </div>
+                        <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold">${item.resultBadge}</span>
+                    </div>
+                    <p class="text-xs text-purple-200/70 leading-relaxed line-clamp-3">${item.desc}</p>
+                    <div class="text-[11px] text-slate-300 bg-slate-950/60 p-2.5 rounded-xl border border-purple-900/20">
+                        <i class="fa-solid fa-user-group text-indigo-400 mr-1"></i> <strong class="text-white">Team:</strong> ${item.teamMembers}
+                    </div>
+                    ${artifactsHtml}
+                    <div class="pt-1 flex gap-2 text-xs">
+                        <button type="button" onclick="openHackathonDetails('${item.id}')" class="bg-slate-900 text-slate-200 px-3 py-1.5 rounded-xl border border-purple-900/40 font-semibold">View Full Archive →</button>
+                    </div>
+                `;
+                vaultList.appendChild(card);
+            });
+        }
+
+        function renderProfileStats() {
+            document.getElementById('profileCountDisplay').innerHTML = `<i class="fa-solid fa-trophy text-amber-400 mr-1.5"></i> Participations: ${hackathonsData.length}`;
+            const wins = hackathonsData.filter(h => h.status === 'won' || h.status === 'finalist').length;
+            document.getElementById('profileWinnersDisplay').innerHTML = `<i class="fa-solid fa-medal text-emerald-400 mr-1.5"></i> Winner / Finalist Badges: ${wins}`;
+        }
+
+        function openAddHackathonModal() {
+            document.getElementById('addHackathonModal').classList.remove('hidden');
+        }
+
+        function closeAddHackathonModal() {
+            document.getElementById('addHackathonModal').classList.add('hidden');
+        }
+
+        function handleNewHackathonSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('newTitle').value;
+            const track = document.getElementById('newTrack').value;
+            const timeline = document.getElementById('newTimeline').value;
+            const status = document.getElementById('newStatus').value;
+            const desc = document.getElementById('newDesc').value;
+            const teamSize = parseInt(document.getElementById('newTeamSize').value) || 1;
+            const teamMembers = document.getElementById('newTeamMembers').value;
+            const ppt = document.getElementById('newPpt').value;
+            const pdf = document.getElementById('newPdf').value;
+            const prototype = document.getElementById('newPrototype').value;
+
+            const badgeMap = {
+                ongoing: 'Live ⚡',
+                evaluation: 'In Review ⏳',
+                completed: 'Completed (Past) 🏅',
+                won: '1st Place Winner 🏆'
+            };
+
+            hackathonsData.unshift({
+                id: Date.now().toString(),
+                title: title,
+                status: status,
+                stage: status === 'ongoing' ? 'Present / Live / Ongoing Event ⚡' : badgeMap[status],
+                desc: desc,
+                timeline: timeline,
+                teamSize: teamSize,
+                teamMembers: teamMembers,
+                track: track,
+                resultBadge: badgeMap[status] || 'Active ⚡',
+                ppt: ppt,
+                pdf: pdf,
+                prototype: prototype
+            });
+
+            closeAddHackathonModal();
+            renderAllViews();
+        }
+
+        function openEditHackathonModal(id) {
+            const item = hackathonsData.find(h => h.id === id);
+            if (!item) return;
+
+            document.getElementById('editHackathonId').value = item.id;
+            document.getElementById('editTitle').value = item.title;
+            document.getElementById('editTrack').value = item.track;
+            document.getElementById('editTimeline').value = item.timeline;
+            document.getElementById('editStatus').value = item.status;
+            document.getElementById('editDesc').value = item.desc;
+            document.getElementById('editTeamSize').value = item.teamSize;
+            document.getElementById('editTeamMembers').value = item.teamMembers;
+            document.getElementById('editPpt').value = item.ppt || '';
+            document.getElementById('editPdf').value = item.pdf || '';
+            document.getElementById('editPrototype').value = item.prototype || '';
+
+            document.getElementById('editHackathonModal').classList.remove('hidden');
+        }
+
+        function closeEditHackathonModal() {
+            document.getElementById('editHackathonModal').classList.add('hidden');
+        }
+
+        function handleEditHackathonSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editHackathonId').value;
+            const item = hackathonsData.find(h => h.id === id);
+            if (!item) return;
+
+            item.title = document.getElementById('editTitle').value;
+            item.track = document.getElementById('editTrack').value;
+            item.timeline = document.getElementById('editTimeline').value;
+            item.status = document.getElementById('editStatus').value;
+            item.desc = document.getElementById('editDesc').value;
+            item.teamSize = parseInt(document.getElementById('editTeamSize').value) || 1;
+            item.teamMembers = document.getElementById('editTeamMembers').value;
+            item.ppt = document.getElementById('editPpt').value;
+            item.pdf = document.getElementById('editPdf').value;
+            item.prototype = document.getElementById('editPrototype').value;
+
+            const badgeMap = {
+                ongoing: 'Live ⚡',
+                evaluation: 'In Review ⏳',
+                completed: 'Completed / Archive (Past) 🏅',
+                won: '1st Place Winner 🏆',
+                finalist: 'Finalist Badge 🎖️'
+            };
+            item.resultBadge = badgeMap[item.status] || 'Updated ⚡';
+
+            closeEditHackathonModal();
+            renderAllViews();
+        }
+
+        function openDeleteModal(id) {
+            document.getElementById('deleteTargetId').value = id;
+            document.getElementById('deleteReason').value = '';
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        function confirmDeleteHackathon() {
+            const id = document.getElementById('deleteTargetId').value;
+            const reason = document.getElementById('deleteReason').value;
+
+            if (!reason.trim()) {
+                alert("Please state a brief reason for deleting this hackathon.");
+                return;
+            }
+
+            hackathonsData = hackathonsData.filter(h => h.id !== id);
+            closeDeleteModal();
+            renderAllViews();
+            alert("Hackathon workspace deleted.");
+        }
+
+        function openHackathonDetails(id) {
+            const item = hackathonsData.find(h => h.id === id);
+            if (!item) {
+                console.error("Hackathon item not found for ID:", id);
+                return;
+            }
+
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalStage').innerText = `Status: ${item.resultBadge}`;
+            document.getElementById('modalDesc').innerText = item.desc;
+            document.getElementById('modalTimeline').innerText = item.timeline;
+            document.getElementById('modalTeam').innerText = item.teamMembers;
+
+            // ONGOING AI PLATFORM NAVIGATION BUTTONS (8x2 Grid layout only)
+            const ongoingAiSection = document.getElementById('modalOngoingAiSection');
+            const aiButtonsContainer = document.getElementById('modalAiButtonsContainer');
+            
+            if (item.status === 'ongoing') {
+                ongoingAiSection.classList.remove('hidden');
+                aiButtonsContainer.innerHTML = '';
+                const requiredTools = ['Claude', 'ChatGPT', 'Gemini', 'Grok', 'Manus', 'Lovable', 'Figma', 'Replit'];
+                
+                requiredTools.forEach(tool => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = "p-2.5 bg-purple-600/25 hover:bg-purple-600/50 text-purple-100 border border-purple-500/50 rounded-xl font-bold flex items-center justify-center gap-1.5 transition text-xs shadow-md";
+                    btn.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-pink-400"></i> ${tool}`;
+                    btn.onclick = () => copyPromptAndNavigate(tool, item.title, item.desc, item.timeline, item.teamMembers);
+                    aiButtonsContainer.appendChild(btn);
+                });
+            } else {
+                ongoingAiSection.classList.add('hidden');
+            }
+
+            const artifactsContainer = document.getElementById('modalArtifactsContainer');
+            artifactsContainer.innerHTML = '';
+
+            const artifacts = [
+                { name: 'PPT Deck', url: item.ppt, icon: 'fa-file-powerpoint', color: 'text-pink-400 border-pink-500/30 bg-pink-500/10' },
+                { name: 'PDF Report', url: item.pdf, icon: 'fa-file-pdf', color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10' },
+                { name: 'Live Prototype', url: item.prototype, icon: 'fa-laptop-code', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' }
+            ];
+
+            artifacts.forEach(art => {
+                const btn = document.createElement('div');
+                if (art.url) {
+                    btn.className = `p-3 rounded-xl border ${art.color} flex items-center justify-between text-xs font-bold cursor-pointer hover:opacity-80 transition`;
+                    btn.innerHTML = `<span class="flex items-center gap-2"><i class="fa-solid ${art.icon}"></i> ${art.name}</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>`;
+                    btn.onclick = () => window.open(art.url, '_blank');
+                } else {
+                    btn.className = `p-3 rounded-xl border border-purple-900/20 bg-slate-950/40 text-slate-500 flex items-center justify-between text-xs font-medium`;
+                    btn.innerHTML = `<span class="flex items-center gap-2"><i class="fa-solid ${art.icon}"></i> ${art.name} (Not Provided)</span>`;
+                }
+                artifactsContainer.appendChild(btn);
+            });
+
+            // Force display modal and remove any hidden classes
+            const modalEl = document.getElementById('projectModal');
+            modalEl.classList.remove('hidden');
+            modalEl.style.display = 'flex';
+        }
+
+        function closeProjectModal() {
+            const modalEl = document.getElementById('projectModal');
+            modalEl.classList.add('hidden');
+            modalEl.style.display = 'none';
+        }
+
+        function toggleAuthMode() {
+            isRegister = !isRegister;
+            document.getElementById('nameField').classList.toggle('hidden', !isRegister);
+            document.getElementById('authTitle').innerText = isRegister ? 'Register Account' : 'Welcome to HackVault';
+            document.getElementById('authBtn').querySelector('span').innerText = isRegister ? 'Register & Launch' : 'Sign In';
+            document.getElementById('authToggleBtn').innerText = isRegister ? 'Sign In Option' : 'Register Option';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const name = document.getElementById('authName').value || 'Alex Developer';
+            document.getElementById('navEmailDisplay').innerText = email;
+            document.getElementById('profileEmail').innerText = email;
+            document.getElementById('profileName').innerText = name;
+            
+            document.getElementById('topNavbar').classList.remove('hidden');
+            document.getElementById('topNavbar').classList.add('flex');
+            navigateTo('homeView');
+            renderHeatmaps();
+        }
+
+        function navigateTo(viewId) {
+            const views = ['landingView', 'homeView', 'hackathonsView', 'vaultView', 'profileView', 'settingsView'];
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if (el) el.classList.add('hidden');
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3.5 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-purple-900/20 transition";
+            });
+            const activeBtn = document.getElementById('nav-' + viewId);
+            if (activeBtn) activeBtn.className = "nav-btn px-3.5 py-2 rounded-xl text-purple-300 bg-purple-500/15 border border-purple-500/30 font-bold";
+            
+            renderHeatmaps();
+        }
+
+        function logout() {
+            document.getElementById('topNavbar').classList.add('hidden');
+            document.getElementById('topNavbar').classList.remove('flex');
+            navigateTo('landingView');
+        }
+
+        const bgThemeMap = {
+            violet: '#090514', midnight: '#020204', cyberpunk: '#04120e', abyss: '#030d1a',
+            sunset: '#170803', dracula: '#12001c', nord: '#0f172a', solarized: '#002b36',
+            rosequartz: '#1f0b16', light: '#f1f5f9'
+        };
+
+        function setBgTheme(key) {
+            const body = document.getElementById('appBody');
+            body.style.backgroundColor = bgThemeMap[key] || '#090514';
+            if (key === 'light') body.classList.add('theme-light');
+            else body.classList.remove('theme-light');
+
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('border-2', 'border-pink-500');
+                btn.classList.add('border');
+            });
+            const activeBtn = document.getElementById('bg-' + key);
+            if (activeBtn) {
+                activeBtn.classList.remove('border');
+                activeBtn.classList.add('border-2', 'border-pink-500');
+            }
+        }
+
+        function setCardStyle(style) {
+            const body = document.getElementById('appBody');
+            body.classList.remove('card-solid', 'card-glass');
+            if (style === 'solid') body.classList.add('card-solid');
+            if (style === 'glass') body.classList.add('card-glass');
+
+            ['glass', 'solid', 'neon'].forEach(s => {
+                const btn = document.getElementById('cardStyle-' + s);
+                if (btn) {
+                    btn.className = "p-3 rounded-xl border border-purple-900/40 bg-slate-900 text-slate-300 font-bold flex items-center justify-center gap-2 transition";
+                }
+            });
+            const activeBtn = document.getElementById('cardStyle-' + style);
+            if (activeBtn) {
+                activeBtn.className = "p-3 rounded-xl border-2 border-pink-500 bg-purple-900/25 text-white font-bold flex items-center justify-center gap-2 transition";
+            }
+        }
+
+        const accentMap = {
+            purple: { grad: 'linear-gradient(135deg, #c084fc, #f472b6, #fb923c)', btn: 'linear-gradient(135deg, #8b5cf6, #ec4899)', color: '#c084fc' },
+            emerald: { grad: 'linear-gradient(135deg, #34d399, #38bdf8, #818cf8)', btn: 'linear-gradient(135deg, #059669, #0284c7)', color: '#34d399' },
+            sunset: { grad: 'linear-gradient(135deg, #fbbf24, #f87171, #ec4899)', btn: 'linear-gradient(135deg, #d97706, #dc2626)', color: '#fbbf24' },
+            cyan: { grad: 'linear-gradient(135deg, #22d3ee, #818cf8, #c084fc)', btn: 'linear-gradient(135deg, #06b6d4, #6366f1)', color: '#22d3ee' }
+        };
+
+        function setAccent(key) {
+            const theme = accentMap[key] || accentMap['purple'];
+            const root = document.documentElement;
+            root.style.setProperty('--accent-grad', theme.grad);
+            root.style.setProperty('--btn-grad', theme.btn);
+            root.style.setProperty('--accent-color', theme.color);
+        }
+
+        function triggerNotificationAlert() {
+            const isChecked = document.getElementById('notifGlobal').checked;
+            if (isChecked) {
+                alert("Push & browser notifications enabled successfully.");
+            } else {
+                alert("Push notifications disabled.");
+            }
+        }
+    </script>
+</body>
+</html>
